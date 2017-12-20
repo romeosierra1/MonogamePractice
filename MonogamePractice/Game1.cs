@@ -12,8 +12,11 @@ namespace MonogamePractice
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        private Texture2D _texture; //001
-        private Vector2 _position; //001
+        /**
+         * 002
+         */
+        private Texture2D _texture;
+        private Vector2 _position;
 
         public Game1()
         {
@@ -43,8 +46,11 @@ namespace MonogamePractice
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            _texture = Content.Load<Texture2D>("Box"); //001
-            _position = new Vector2(0, 0); //001
+            /**
+             * 002
+             */
+            _texture = Content.Load<Texture2D>("Box");
+            _position = new Vector2(0, 0);
         }
 
         /// <summary>
@@ -66,7 +72,25 @@ namespace MonogamePractice
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            /**
+             * 002
+             */
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+            {
+                _position.Y -= 1;
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.Down))
+            {
+                _position.Y += 1;
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            {
+                _position.X -= 1;
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            {
+                _position.X += 1;
+            }
 
             base.Update(gameTime);
         }
@@ -79,11 +103,12 @@ namespace MonogamePractice
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin(); //001
-
-            spriteBatch.Draw(_texture, _position, Color.White); //001
-
-            spriteBatch.End(); //001
+            /**
+             * 002
+             */
+            spriteBatch.Begin();
+            spriteBatch.Draw(_texture, _position, Color.White);
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
