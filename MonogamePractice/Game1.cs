@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonogamePractice.Sprites;
 using System.Collections.Generic;
 
 namespace MonogamePractice
@@ -14,9 +15,9 @@ namespace MonogamePractice
         SpriteBatch spriteBatch;
 
         /**
-         * 005
+         * 006
          */
-        private Sprite _sprite;
+        private List<Sprite> _sprites;
 
         public Game1()
         {
@@ -47,16 +48,17 @@ namespace MonogamePractice
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             /**
-             * 005
+             * 006
              */
-            var texture = Content.Load<Texture2D>("Sprite");
-
-            _sprite = new Sprite(texture)
+            var shipTexture = Content.Load<Texture2D>("Ship");
+            _sprites = new List<Sprite>()
             {
-                Position = new Vector2(100, 100),
-                Origin = new Vector2(texture.Width / 2, texture.Height - 25)
+                new Ship(shipTexture)
+                {
+                    Position = new Vector2(100,100),
+                    Bullet = new Bullet(Content.Load<Texture2D>("Bullet")),
+                }
             };
-
         }
 
         /// <summary>
@@ -79,11 +81,28 @@ namespace MonogamePractice
                 Exit();
 
             /**
-             * 005
+             * 006
              */
-            _sprite.Update();
+            foreach (var sprite in _sprites.ToArray())
+            {
+                sprite.Update(gameTime, _sprites);
+            }
+
+            PostUpdate();
 
             base.Update(gameTime);
+        }
+
+        private void PostUpdate()
+        {
+            for (int i = 0; i < _sprites.Count; i++)
+            {
+                if (_sprites[i].IsRemoved)
+                {
+                    _sprites.RemoveAt(i);
+                    i--;
+                }
+            }
         }
 
         /// <summary>
@@ -95,11 +114,14 @@ namespace MonogamePractice
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             /**
-             * 005
+             * 006
              */
             spriteBatch.Begin();
 
-            _sprite.Draw(spriteBatch);
+            foreach (var sprite in _sprites)
+            {
+                sprite.Draw(spriteBatch);
+            }
 
             spriteBatch.End();
 
