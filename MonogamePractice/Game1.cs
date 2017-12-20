@@ -14,9 +14,9 @@ namespace MonogamePractice
         SpriteBatch spriteBatch;
 
         /**
-         * 004
+         * 005
          */
-        private List<Sprite> _sprites;
+        private Sprite _sprite;
 
         public Game1()
         {
@@ -47,35 +47,16 @@ namespace MonogamePractice
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             /**
-             * 004
+             * 005
              */
-            var texture = Content.Load<Texture2D>("Box");
+            var texture = Content.Load<Texture2D>("Sprite");
 
-            _sprites = new List<Sprite>()
+            _sprite = new Sprite(texture)
             {
-                new Sprite(texture)
-                {
-                    Position = new Vector2(100,100),
-                    Input = new Input()
-                    {
-                        Up = Keys.W,
-                        Down = Keys.S,
-                        Left = Keys.A,
-                        Right = Keys.D
-                    }
-                },
-                new Sprite(texture)
-                {
-                    Position = new Vector2(200,100),
-                    Input = new Input()
-                    {
-                        Up = Keys.Up,
-                        Down = Keys.Down,
-                        Left = Keys.Left,
-                        Right = Keys.Right
-                    }
-                }
+                Position = new Vector2(100, 100),
+                Origin = new Vector2(texture.Width / 2, texture.Height - 25)
             };
+
         }
 
         /// <summary>
@@ -98,12 +79,9 @@ namespace MonogamePractice
                 Exit();
 
             /**
-             * 004
+             * 005
              */
-            foreach (var sprite in _sprites)
-            {
-                sprite.Update();
-            }
+            _sprite.Update();
 
             base.Update(gameTime);
         }
@@ -117,14 +95,11 @@ namespace MonogamePractice
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             /**
-             * 004
+             * 005
              */
             spriteBatch.Begin();
 
-            foreach (var sprite in _sprites)
-            {
-                sprite.Draw(spriteBatch);
-            }
+            _sprite.Draw(spriteBatch);
 
             spriteBatch.End();
 
