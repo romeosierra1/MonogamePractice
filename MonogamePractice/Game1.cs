@@ -12,6 +12,9 @@ namespace MonogamePractice
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        private Texture2D _texture; //001
+        private Vector2 _position; //001
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -40,7 +43,8 @@ namespace MonogamePractice
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            _texture = Content.Load<Texture2D>("Box"); //001
+            _position = new Vector2(0, 0); //001
         }
 
         /// <summary>
@@ -75,7 +79,11 @@ namespace MonogamePractice
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            spriteBatch.Begin(); //001
+
+            spriteBatch.Draw(_texture, _position, Color.White); //001
+
+            spriteBatch.End(); //001
 
             base.Draw(gameTime);
         }
