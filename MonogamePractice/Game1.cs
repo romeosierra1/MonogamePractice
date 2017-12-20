@@ -13,10 +13,10 @@ namespace MonogamePractice
         SpriteBatch spriteBatch;
 
         /**
-         * 002
+         * 003
          */
-        private Texture2D _texture;
-        private Vector2 _position;
+        private Sprite _sprite1;
+        private Sprite _sprite2;
 
         public Game1()
         {
@@ -47,10 +47,19 @@ namespace MonogamePractice
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             /**
-             * 002
+             * 003
              */
-            _texture = Content.Load<Texture2D>("Box");
-            _position = new Vector2(0, 0);
+
+            var texture = Content.Load<Texture2D>("Box");
+
+            _sprite1 = new Sprite(texture);
+            _sprite1.Position = new Vector2(100, 100);
+
+            _sprite2 = new Sprite(texture)
+            {
+                Position = new Vector2(200, 100),
+                Speed = 3f
+            };
         }
 
         /// <summary>
@@ -73,24 +82,10 @@ namespace MonogamePractice
                 Exit();
 
             /**
-             * 002
+             * 003
              */
-            if (Keyboard.GetState().IsKeyDown(Keys.Up))
-            {
-                _position.Y -= 1;
-            }
-            if (Keyboard.GetState().IsKeyDown(Keys.Down))
-            {
-                _position.Y += 1;
-            }
-            if (Keyboard.GetState().IsKeyDown(Keys.Left))
-            {
-                _position.X -= 1;
-            }
-            if (Keyboard.GetState().IsKeyDown(Keys.Right))
-            {
-                _position.X += 1;
-            }
+            _sprite1.Update();
+            _sprite2.Update();
 
             base.Update(gameTime);
         }
@@ -104,10 +99,13 @@ namespace MonogamePractice
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             /**
-             * 002
+             * 003
              */
             spriteBatch.Begin();
-            spriteBatch.Draw(_texture, _position, Color.White);
+
+            _sprite1.Draw(spriteBatch);
+            _sprite2.Draw(spriteBatch);
+
             spriteBatch.End();
 
             base.Draw(gameTime);
