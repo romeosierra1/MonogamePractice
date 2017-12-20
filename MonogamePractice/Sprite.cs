@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 namespace MonogamePractice
 {
     /**
-     * 003
+     * 004
      */
-    class Sprite
+    public class Sprite
     {
         private Texture2D _texture;
         public Vector2 Position;
-
         public float Speed = 2f;
+        public Input Input;
 
         public Sprite(Texture2D texture)
         {
@@ -26,21 +26,34 @@ namespace MonogamePractice
 
         public void Update()
         {
-            if(Keyboard.GetState().IsKeyDown(Keys.Up))
+            Move();
+        }
+
+        private void Move()
+        {
+            if(Input == null)
             {
-                Position.Y -= Speed;
+                return;
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.Down))
-            {
-                Position.Y += Speed;
-            }
-            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+
+            if(Keyboard.GetState().IsKeyDown(Input.Left))
             {
                 Position.X -= Speed;
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+
+            if (Keyboard.GetState().IsKeyDown(Input.Right))
             {
                 Position.X += Speed;
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Input.Up))
+            {
+                Position.Y -= Speed;
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Input.Down))
+            {
+                Position.Y += Speed;
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace MonogamePractice
 {
@@ -13,10 +14,9 @@ namespace MonogamePractice
         SpriteBatch spriteBatch;
 
         /**
-         * 003
+         * 004
          */
-        private Sprite _sprite1;
-        private Sprite _sprite2;
+        private List<Sprite> _sprites;
 
         public Game1()
         {
@@ -47,18 +47,34 @@ namespace MonogamePractice
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             /**
-             * 003
+             * 004
              */
-
             var texture = Content.Load<Texture2D>("Box");
 
-            _sprite1 = new Sprite(texture);
-            _sprite1.Position = new Vector2(100, 100);
-
-            _sprite2 = new Sprite(texture)
+            _sprites = new List<Sprite>()
             {
-                Position = new Vector2(200, 100),
-                Speed = 3f
+                new Sprite(texture)
+                {
+                    Position = new Vector2(100,100),
+                    Input = new Input()
+                    {
+                        Up = Keys.W,
+                        Down = Keys.S,
+                        Left = Keys.A,
+                        Right = Keys.D
+                    }
+                },
+                new Sprite(texture)
+                {
+                    Position = new Vector2(200,100),
+                    Input = new Input()
+                    {
+                        Up = Keys.Up,
+                        Down = Keys.Down,
+                        Left = Keys.Left,
+                        Right = Keys.Right
+                    }
+                }
             };
         }
 
@@ -82,10 +98,12 @@ namespace MonogamePractice
                 Exit();
 
             /**
-             * 003
+             * 004
              */
-            _sprite1.Update();
-            _sprite2.Update();
+            foreach (var sprite in _sprites)
+            {
+                sprite.Update();
+            }
 
             base.Update(gameTime);
         }
@@ -99,12 +117,14 @@ namespace MonogamePractice
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             /**
-             * 003
+             * 004
              */
             spriteBatch.Begin();
 
-            _sprite1.Draw(spriteBatch);
-            _sprite2.Draw(spriteBatch);
+            foreach (var sprite in _sprites)
+            {
+                sprite.Draw(spriteBatch);
+            }
 
             spriteBatch.End();
 
