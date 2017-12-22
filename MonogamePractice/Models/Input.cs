@@ -5,15 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MonogamePractice.Models
+namespace MonogamePractice
 {
-    /**
-     * 009
-     **/
     public class Input
     {
-        public Keys Left;
-        public Keys Right;
         public Keys Up;
         public Keys Down;
     }

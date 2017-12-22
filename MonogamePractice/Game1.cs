@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonogamePractice.Models;
@@ -15,11 +16,20 @@ namespace MonogamePractice
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        
+        public static int GameWindowWidth;        
+        public static int GameWindowHeight;
 
-        /**
-         * 009
-         */
-        private List<Sprite> _sprites;
+        public static Random Random;
+        public const int MaxScore = 2;
+        public static bool GameOver;
+        public const string Player1 = "Player1";
+        public const string Player2 = "Player2";
+        public static string Winner;
+        private Score Score;
+        private List<Sprite> Sprites;
+        private List<SoundEffect> SoundEffects;
+        Texture2D divider;
 
         public Game1()
         {
@@ -35,7 +45,10 @@ namespace MonogamePractice
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            GameWindowWidth = graphics.PreferredBackBufferWidth;
+            GameWindowHeight = graphics.PreferredBackBufferHeight;
+
+            Random = new Random();
 
             base.Initialize();
         }
@@ -48,39 +61,46 @@ namespace MonogamePractice
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            
+            var batLeftTexture = Content.Load<Texture2D>("images/BatLeft");
+            var batRightTexture = Content.Load<Texture2D>("images/BatRight");
+            var ballTexture = Content.Load<Texture2D>("images/Ball");
 
-            /**
-             * 009
-             */
-
-            var playerTexture = Content.Load<Texture2D>("Player");
-            _sprites = new List<Sprite>()
+            Score = new Score(Content.Load<SpriteFont>("fonts/SpriteFont1"));
+            
+            SoundEffects = new List<SoundEffect>();
+            SoundEffects.Add(Content.Load<SoundEffect>("sounds/applause1"));
+            SoundEffects.Add(Content.Load<SoundEffect>("sounds/click"));
+            SoundEffects.Add(Content.Load<SoundEffect>("sounds/ding"));
+            
+            Sprites = new List<Sprite>()
             {
-                new Player(playerTexture)
+                new Bat(batLeftTexture)
                 {
+                    Speed = new Speed(),
+                    Position = new Vector2(20, (GameWindowHeight / 2) - (batLeftTexture.Height / 2)),
                     Input = new Input()
                     {
-                        Left = Keys.A,
-                        Right = Keys.D,
-                        Up = Keys.W,
-                        Down = Keys.S
-                    },
-                    Position = new Vector2(100,100),
-                    Color = Color.Blue,
-                    Speed = 5f
+                        Up = Keys.A,
+                        Down = Keys.Z
+                    }
                 },
-                new Player(playerTexture)
+                new Bat(batRightTexture)
                 {
+                    Speed = new Speed(),
+                    Position = new Vector2(GameWindowWidth - 20 - batRightTexture.Width, (GameWindowHeight / 2) - (batRightTexture.Height / 2)),
                     Input = new Input()
                     {
-                        Left = Keys.Left,
-                        Right = Keys.Right,
                         Up = Keys.Up,
                         Down = Keys.Down
-                    },
-                    Position = new Vector2(300,100),
-                    Color = Color.Green,
-                    Speed = 5f
+                    }
+                },
+                new Ball(ballTexture)
+                {
+                    Speed = new Speed(),
+                    Position = new Vector2((GameWindowWidth / 2) - (ballTexture.Width / 2), (GameWindowHeight / 2) - (ballTexture.Height / 2)),
+                    Score = Score,
+                    SoundEffects = SoundEffects
                 }
             };
         }
@@ -103,15 +123,35 @@ namespace MonogamePractice
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
-            /**
-             * 009
-             */
-            foreach (var sprite in _sprites)
+            
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
-                sprite.Update(gameTime, _sprites);
+                Exit();
             }
             
+            if (GameOver)
+            {
+                if (Keyboard.GetState().IsKeyDown(Keys.Space))
+                {
+                    Score.Score1 = 0;
+                    Score.Score2 = 0;
+                    GameOver = false;
+                    
+                    foreach (var sprite in Sprites)
+                    {
+                        if (sprite is Bat)
+                        {
+                            sprite.Position = (Vector2)(sprite as Bat).StartPosition;
+                        }
+                    }
+                }
+            }
+
+            foreach (var sprite in Sprites)
+            {
+                sprite.Update(gameTime, Sprites);
+            }
+
             base.Update(gameTime);
         }
         
@@ -123,15 +163,25 @@ namespace MonogamePractice
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            /**
-             * 009
-             */
+            GraphicsDevice.Clear(Color.RoyalBlue);
 
             spriteBatch.Begin();
 
-            foreach (var sprite in _sprites)
+            divider = new Texture2D(GraphicsDevice, 1, 1);
+            divider.SetData(new[] { Color.Black });
+
+            spriteBatch.Draw(divider, new Rectangle((GameWindowWidth / 2) - 3, 0, 5, GameWindowHeight), Color.Black);
+
+            foreach (var sprite in Sprites)
             {
                 sprite.Draw(spriteBatch);
+            }
+
+            Score.Draw(spriteBatch);
+
+            if (GameOver)
+            {
+                Score.DrawWinner(spriteBatch, Winner);
             }
 
             spriteBatch.End();
