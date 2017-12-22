@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using MonogamePractice.Managers;
 using MonogamePractice.Models;
 using System;
 using System.Collections.Generic;
@@ -12,67 +13,108 @@ namespace MonogamePractice.Sprites
 {
     public class Sprite
     {
-        public Texture2D Texture;        
-        public Vector2 Position;
-        public Vector2 Velocity;
-        public Speed Speed;
+        protected Texture2D _texture;
+        protected AnimationManager _animationManager;
+        protected Dictionary<string, Animation> _animations;
+        protected Vector2 _position;
+
         public Input Input;
 
-        public List<SoundEffect> SoundEffects;
-
-        public Rectangle Rectangle
+        public Vector2 Position
         {
-            get
+            get { return _position; }
+            set
             {
-                return new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
+                _position = value;
+
+                if(_animationManager != null)
+                {
+                    _animationManager.Position = _position;
+                }
             }
+        }
+
+        public float Speed = 1f;
+
+        public Vector2 Velocity;
+
+        public virtual void Draw(SpriteBatch spriteBatch)
+        {
+            if (_texture != null)
+            {
+                spriteBatch.Draw(_texture, Position, Color.White);
+            }
+            else if (_animationManager != null)
+            {
+                _animationManager.Draw(spriteBatch);
+            }
+            else throw new Exception("Something wrong.");
+        }
+
+        protected virtual void Move()
+        {
+            if(Keyboard.GetState().IsKeyDown(Input.Up))
+            {
+                Velocity.Y = -Speed;
+            }
+            else if (Keyboard.GetState().IsKeyDown(Input.Down))
+            {
+                Velocity.Y = Speed;
+            }
+            else if (Keyboard.GetState().IsKeyDown(Input.Left))
+            {
+                Velocity.X = -Speed;
+            }
+            else if (Keyboard.GetState().IsKeyDown(Input.Right))
+            {
+                Velocity.X = Speed;
+            }
+            else
+            {
+                _animationManager.Stop();
+            }
+        }
+
+        protected virtual void SetAnimations()
+        {
+            if (Velocity.X > 0)
+            {
+                _animationManager.Play(_animations["WalkRight"]);
+            }
+            else if (Velocity.X < 0)
+            {
+                _animationManager.Play(_animations["WalkLeft"]);
+            }
+            else if (Velocity.Y > 0)
+            {
+                _animationManager.Play(_animations["WalkDown"]);
+            }
+            else if (Velocity.Y < 0)
+            {
+                _animationManager.Play(_animations["WalkDown"]);
+            }
+        }
+
+        public Sprite(Dictionary<string, Animation> animations)
+        {
+            _animations = animations;
+            _animationManager = new AnimationManager(_animations.First().Value);
         }
 
         public Sprite(Texture2D texture)
         {
-            Texture = texture;
+            _texture = texture;
         }
 
         public virtual void Update(GameTime gameTime, List<Sprite> sprites)
         {
+            Move();
+            SetAnimations();
 
-        }
+            _animationManager.Update(gameTime);
 
-        public virtual void Draw(SpriteBatch spriteBatch)
-        {
-            spriteBatch.Draw(Texture, Position, Color.White);
-        }
-        
-        protected bool IsCollidingLeft(Sprite sprite)
-        {
-            return this.Rectangle.Right + this.Velocity.X > sprite.Rectangle.Left &&
-                   this.Rectangle.Left < sprite.Rectangle.Left &&
-                   this.Rectangle.Bottom > sprite.Rectangle.Top &&
-                   this.Rectangle.Top < sprite.Rectangle.Bottom;
-        }
-
-        protected bool IsCollidingRight(Sprite sprite)
-        {
-            return this.Rectangle.Left + this.Velocity.X < sprite.Rectangle.Right &&
-                   this.Rectangle.Right > sprite.Rectangle.Right &&
-                   this.Rectangle.Bottom > sprite.Rectangle.Top &&
-                   this.Rectangle.Top < sprite.Rectangle.Bottom;
-        }
-
-        protected bool IsCollidingTop(Sprite sprite)
-        {
-            return this.Rectangle.Bottom + this.Velocity.Y > sprite.Rectangle.Top &&
-                   this.Rectangle.Top < sprite.Rectangle.Top &&
-                   this.Rectangle.Right > sprite.Rectangle.Left &&
-                   this.Rectangle.Left < sprite.Rectangle.Right;
-        }
-
-        protected bool IsCollidingBottom(Sprite sprite)
-        {
-            return this.Rectangle.Top + this.Velocity.Y < sprite.Rectangle.Bottom &&
-                   this.Rectangle.Bottom > sprite.Rectangle.Bottom &&
-                   this.Rectangle.Right > sprite.Rectangle.Left &&
-                   this.Rectangle.Left < sprite.Rectangle.Right;
+            Position += Velocity;
+            Velocity = Vector2.Zero;
         }
     }
 }

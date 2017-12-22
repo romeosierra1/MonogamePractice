@@ -16,20 +16,8 @@ namespace MonogamePractice
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        
-        public static int GameWindowWidth;        
-        public static int GameWindowHeight;
 
-        public static Random Random;
-        public const int MaxScore = 2;
-        public static bool GameOver;
-        public const string Player1 = "Player1";
-        public const string Player2 = "Player2";
-        public static string Winner;
-        private Score Score;
-        private List<Sprite> Sprites;
-        private List<SoundEffect> SoundEffects;
-        Texture2D divider;
+        private List<Sprite> _sprites;
 
         public Game1()
         {
@@ -45,11 +33,6 @@ namespace MonogamePractice
         /// </summary>
         protected override void Initialize()
         {
-            GameWindowWidth = graphics.PreferredBackBufferWidth;
-            GameWindowHeight = graphics.PreferredBackBufferHeight;
-
-            Random = new Random();
-
             base.Initialize();
         }
 
@@ -61,46 +44,38 @@ namespace MonogamePractice
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            
-            var batLeftTexture = Content.Load<Texture2D>("images/BatLeft");
-            var batRightTexture = Content.Load<Texture2D>("images/BatRight");
-            var ballTexture = Content.Load<Texture2D>("images/Ball");
 
-            Score = new Score(Content.Load<SpriteFont>("fonts/SpriteFont1"));
-            
-            SoundEffects = new List<SoundEffect>();
-            SoundEffects.Add(Content.Load<SoundEffect>("sounds/applause1"));
-            SoundEffects.Add(Content.Load<SoundEffect>("sounds/click"));
-            SoundEffects.Add(Content.Load<SoundEffect>("sounds/ding"));
-            
-            Sprites = new List<Sprite>()
+            var animations = new Dictionary<string, Animation>()
             {
-                new Bat(batLeftTexture)
+                {"WalkUp", new Animation(Content.Load<Texture2D>("Player/WalkingUp"), 3) },
+                {"WalkDown", new Animation(Content.Load<Texture2D>("Player/WalkingDown"), 3) },
+                {"WalkLeft", new Animation(Content.Load<Texture2D>("Player/WalkingLeft"), 3) },
+                {"WalkRight", new Animation(Content.Load<Texture2D>("Player/WalkingRight"), 3) }
+            };
+
+            _sprites = new List<Sprite>()
+            {
+                new Sprite(animations)
                 {
-                    Speed = new Speed(),
-                    Position = new Vector2(20, (GameWindowHeight / 2) - (batLeftTexture.Height / 2)),
+                    Position = new Vector2(100,100),
                     Input = new Input()
                     {
-                        Up = Keys.A,
-                        Down = Keys.Z
+                        Up = Keys.W,
+                        Down = Keys.S,
+                        Left = Keys.A,
+                        Right = Keys.D
                     }
                 },
-                new Bat(batRightTexture)
+                new Sprite(animations)
                 {
-                    Speed = new Speed(),
-                    Position = new Vector2(GameWindowWidth - 20 - batRightTexture.Width, (GameWindowHeight / 2) - (batRightTexture.Height / 2)),
+                    Position = new Vector2(200,100),
                     Input = new Input()
                     {
                         Up = Keys.Up,
-                        Down = Keys.Down
+                        Down = Keys.Down,
+                        Left = Keys.Left,
+                        Right = Keys.Right
                     }
-                },
-                new Ball(ballTexture)
-                {
-                    Speed = new Speed(),
-                    Position = new Vector2((GameWindowWidth / 2) - (ballTexture.Width / 2), (GameWindowHeight / 2) - (ballTexture.Height / 2)),
-                    Score = Score,
-                    SoundEffects = SoundEffects
                 }
             };
         }
@@ -122,68 +97,31 @@ namespace MonogamePractice
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-            
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                Exit();
-            }
-            
-            if (GameOver)
-            {
-                if (Keyboard.GetState().IsKeyDown(Keys.Space))
-                {
-                    Score.Score1 = 0;
-                    Score.Score2 = 0;
-                    GameOver = false;
-                    
-                    foreach (var sprite in Sprites)
-                    {
-                        if (sprite is Bat)
-                        {
-                            sprite.Position = (Vector2)(sprite as Bat).StartPosition;
-                        }
-                    }
-                }
-            }
+                Exit();           
 
-            foreach (var sprite in Sprites)
+            foreach (var sprite in _sprites)
             {
-                sprite.Update(gameTime, Sprites);
+                sprite.Update(gameTime, _sprites);
             }
 
             base.Update(gameTime);
         }
-        
+
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            GraphicsDevice.Clear(Color.RoyalBlue);
+            GraphicsDevice.Clear(Color.CornflowerBlue);            
 
             spriteBatch.Begin();
-
-            divider = new Texture2D(GraphicsDevice, 1, 1);
-            divider.SetData(new[] { Color.Black });
-
-            spriteBatch.Draw(divider, new Rectangle((GameWindowWidth / 2) - 3, 0, 5, GameWindowHeight), Color.Black);
-
-            foreach (var sprite in Sprites)
+            
+            foreach (var sprite in _sprites)
             {
                 sprite.Draw(spriteBatch);
             }
-
-            Score.Draw(spriteBatch);
-
-            if (GameOver)
-            {
-                Score.DrawWinner(spriteBatch, Winner);
-            }
-
+            
             spriteBatch.End();
 
             base.Draw(gameTime);

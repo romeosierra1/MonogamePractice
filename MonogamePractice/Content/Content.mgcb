@@ -13,14 +13,7 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin fonts/SpriteFont1.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:fonts/SpriteFont1.spritefont
-
-#begin images/Ball.png
+#begin Player/WalkingDown.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -30,9 +23,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:images/Ball.png
+/build:Player/WalkingDown.png
 
-#begin images/BatLeft.png
+#begin Player/WalkingLeft.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -42,9 +35,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:images/BatLeft.png
+/build:Player/WalkingLeft.png
 
-#begin images/BatRight.png
+#begin Player/WalkingRight.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -54,9 +47,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:images/BatRight.png
+/build:Player/WalkingRight.png
 
-#begin images/Scorebar.png
+#begin Player/WalkingUp.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -66,23 +59,5 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:images/Scorebar.png
-
-#begin sounds/applause1.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:sounds/applause1.wav
-
-#begin sounds/click.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:sounds/click.wav
-
-#begin sounds/ding.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:sounds/ding.wav
+/build:Player/WalkingUp.png
 
