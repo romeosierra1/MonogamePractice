@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonogamePractice.Models;
 using MonogamePractice.Sprites;
+using System;
 using System.Collections.Generic;
 
 namespace MonogamePractice
@@ -15,14 +17,26 @@ namespace MonogamePractice
         SpriteBatch spriteBatch;
 
         /**
-         * 006
+         * 007
          */
+        public static Random Random;
+        public static int ScreenHeight;
+        public static int ScreenWidth;
+
         private List<Sprite> _sprites;
+
+        private float _timer;
+
+        private bool _hasStarted = false;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            Random = new Random();
+            ScreenHeight = graphics.PreferredBackBufferHeight;
+            ScreenWidth = graphics.PreferredBackBufferWidth;
         }
 
         /// <summary>
@@ -48,17 +62,30 @@ namespace MonogamePractice
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             /**
-             * 006
+             * 007
              */
-            var shipTexture = Content.Load<Texture2D>("Ship");
+            Restart();
+        }
+
+        private void Restart()
+        {
+            var playerTexture = Content.Load<Texture2D>("Player");
+
             _sprites = new List<Sprite>()
             {
-                new Ship(shipTexture)
+                new Player(playerTexture)
                 {
-                    Position = new Vector2(100,100),
-                    Bullet = new Bullet(Content.Load<Texture2D>("Bullet")),
+                   Position = new Vector2((ScreenWidth / 2) - (playerTexture.Width/2), ScreenHeight - playerTexture.Height),
+                   Input = new Input()
+                   {
+                       Left= Keys.Left,
+                       Right= Keys.Right
+                   },
+                   Speed= 10f
                 }
             };
+
+            _hasStarted = false;
         }
 
         /// <summary>
@@ -81,28 +108,52 @@ namespace MonogamePractice
                 Exit();
 
             /**
-             * 006
+             * 007
              */
-            foreach (var sprite in _sprites.ToArray())
+
+            if(Keyboard.GetState().IsKeyDown(Keys.Space))
+            {
+                _hasStarted = true;
+            }
+
+            if(!_hasStarted)
+            {
+                return;
+            }
+
+            _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            foreach (var sprite in _sprites)
             {
                 sprite.Update(gameTime, _sprites);
             }
 
-            PostUpdate();
+            if(_timer > 0.25f)
+            {
+                _timer = 0;
+                _sprites.Add(new Bomb(Content.Load<Texture2D>("Bomb")));
+            }
 
-            base.Update(gameTime);
-        }
-
-        private void PostUpdate()
-        {
             for (int i = 0; i < _sprites.Count; i++)
             {
-                if (_sprites[i].IsRemoved)
+                var sprite = _sprites[i];
+                if(sprite.IsRemoved)
                 {
                     _sprites.RemoveAt(i);
                     i--;
                 }
+
+                if(sprite is Player)
+                {
+                    var player = sprite as Player;
+                    if(player.HasDied)
+                    {
+                        Restart();
+                    }
+                }
             }
+
+            base.Update(gameTime);
         }
 
         /// <summary>
@@ -114,7 +165,7 @@ namespace MonogamePractice
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             /**
-             * 006
+             * 007
              */
             spriteBatch.Begin();
 

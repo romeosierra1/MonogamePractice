@@ -42,10 +42,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Game1.cs" />
+    <Compile Include="Models\Input.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sprites\Bullet.cs" />
-    <Compile Include="Sprites\Ship.cs" />
+    <Compile Include="Sprites\Bomb.cs" />
+    <Compile Include="Sprites\Player.cs" />
     <Compile Include="Sprites\Sprite.cs" />
   </ItemGroup>
   <ItemGroup>

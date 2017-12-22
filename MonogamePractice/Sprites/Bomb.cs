@@ -9,27 +9,25 @@ using System.Threading.Tasks;
 namespace MonogamePractice.Sprites
 {
     /**
-    * 006
-    */
-    public class Bullet : Sprite
+     * 007
+     */
+    public class Bomb : Sprite
     {
-        private float _timer;
-        public Bullet(Texture2D texture)
-            :base(texture)
+        public Bomb(Texture2D texture)
+            : base(texture)
         {
-
+            Position = new Vector2(Game1.Random.Next(0, Game1.ScreenWidth - _texture.Width), -_texture.Height);
+            Speed = Game1.Random.Next(3, 10);
         }
 
         public override void Update(GameTime gameTime, List<Sprite> sprites)
         {
-            _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Position.Y += Speed;
 
-            if(_timer > LifeSpan)
+            if (Rectangle.Bottom >= Game1.ScreenHeight)
             {
                 IsRemoved = true;
             }
-
-            Position += Direction * LinearVelocity;
         }
     }
 }
