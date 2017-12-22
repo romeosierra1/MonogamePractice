@@ -9,24 +9,23 @@ using System.Threading.Tasks;
 
 namespace MonogamePractice.Sprites
 {
-    /**
-     * 007
-     */
     public class Sprite
     {
         protected Texture2D _texture;
-   
-        public Vector2 Position;
-        public Vector2 Velocity;
+
+        public Vector2 Postition;
         public float Speed;
+        public Color Color = Color.White;
+
         public Input Input;
-        public bool IsRemoved = false;
+
+        public bool IsRemoved;
 
         public Rectangle Rectangle
         {
             get
             {
-                return new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
+                return new Rectangle((int)Postition.X, (int)Postition.Y, _texture.Width, _texture.Height);
             }
         }
 
@@ -42,7 +41,7 @@ namespace MonogamePractice.Sprites
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_texture, Position, Color.White);
+            spriteBatch.Draw(_texture, Postition, Color);
         }
     }
 }

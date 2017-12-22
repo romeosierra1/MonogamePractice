@@ -17,17 +17,21 @@ namespace MonogamePractice
         SpriteBatch spriteBatch;
 
         /**
-         * 007
+         * 008
          */
+
         public static Random Random;
-        public static int ScreenHeight;
+
         public static int ScreenWidth;
+        public static int ScreenHeight;
 
         private List<Sprite> _sprites;
 
+        private SpriteFont _font;
+
         private float _timer;
 
-        private bool _hasStarted = false;
+        private Texture2D _appleTexture;
 
         public Game1()
         {
@@ -35,8 +39,9 @@ namespace MonogamePractice
             Content.RootDirectory = "Content";
 
             Random = new Random();
-            ScreenHeight = graphics.PreferredBackBufferHeight;
+
             ScreenWidth = graphics.PreferredBackBufferWidth;
+            ScreenHeight = graphics.PreferredBackBufferHeight;
         }
 
         /// <summary>
@@ -62,30 +67,42 @@ namespace MonogamePractice
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             /**
-             * 007
+             * 008
              */
-            Restart();
-        }
 
-        private void Restart()
-        {
             var playerTexture = Content.Load<Texture2D>("Player");
-
             _sprites = new List<Sprite>()
             {
                 new Player(playerTexture)
                 {
-                   Position = new Vector2((ScreenWidth / 2) - (playerTexture.Width/2), ScreenHeight - playerTexture.Height),
-                   Input = new Input()
-                   {
-                       Left= Keys.Left,
-                       Right= Keys.Right
-                   },
-                   Speed= 10f
+                    Input = new Input()
+                    {
+                        Left = Keys.A,
+                        Right = Keys.D,
+                        Up = Keys.W,
+                        Down = Keys.S
+                    },
+                    Postition = new Vector2(100,100),
+                    Color = Color.Blue,
+                    Speed = 5f
+                },
+                new Player(playerTexture)
+                {
+                    Input = new Input()
+                    {
+                        Left = Keys.Left,
+                        Right = Keys.Right,
+                        Up = Keys.Up,
+                        Down = Keys.Down
+                    },
+                    Postition = new Vector2(ScreenWidth - 100-playerTexture.Width,100),
+                    Color = Color.Green,
+                    Speed = 5f
                 }
             };
 
-            _hasStarted = false;
+            _font = Content.Load<SpriteFont>("Font");
+            _appleTexture = Content.Load<Texture2D>("Apple");
         }
 
         /// <summary>
@@ -108,19 +125,8 @@ namespace MonogamePractice
                 Exit();
 
             /**
-             * 007
+             * 008
              */
-
-            if(Keyboard.GetState().IsKeyDown(Keys.Space))
-            {
-                _hasStarted = true;
-            }
-
-            if(!_hasStarted)
-            {
-                return;
-            }
-
             _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             foreach (var sprite in _sprites)
@@ -128,32 +134,39 @@ namespace MonogamePractice
                 sprite.Update(gameTime, _sprites);
             }
 
-            if(_timer > 0.25f)
+            PostUpdate();
+
+            SpawnApple();
+
+            base.Update(gameTime);
+        }
+
+        private void SpawnApple()
+        {
+            if (_timer > 1)
             {
                 _timer = 0;
-                _sprites.Add(new Bomb(Content.Load<Texture2D>("Bomb")));
-            }
 
+                var xPos = Random.Next(0, ScreenWidth - _appleTexture.Width);
+                var yPos = Random.Next(0, ScreenHeight - _appleTexture.Height);
+
+                _sprites.Add(new Sprite(_appleTexture)
+                {
+                    Postition = new Vector2(xPos, yPos)
+                });
+            }
+        }
+
+        private void PostUpdate()
+        {
             for (int i = 0; i < _sprites.Count; i++)
             {
-                var sprite = _sprites[i];
-                if(sprite.IsRemoved)
+                if (_sprites[i].IsRemoved)
                 {
                     _sprites.RemoveAt(i);
                     i--;
                 }
-
-                if(sprite is Player)
-                {
-                    var player = sprite as Player;
-                    if(player.HasDied)
-                    {
-                        Restart();
-                    }
-                }
             }
-
-            base.Update(gameTime);
         }
 
         /// <summary>
@@ -165,13 +178,25 @@ namespace MonogamePractice
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             /**
-             * 007
+             * 008
              */
+
             spriteBatch.Begin();
 
             foreach (var sprite in _sprites)
             {
                 sprite.Draw(spriteBatch);
+            }
+
+            var fontY = 10;
+            var i = 0;
+
+            foreach (var sprite in _sprites)
+            {
+                if(sprite is Player)
+                {
+                    spriteBatch.DrawString(_font, string.Format("Player {0}: {1}", ++i, ((Player)sprite).Score), new Vector2(10, fontY += 20), Color.Black);
+                }
             }
 
             spriteBatch.End();

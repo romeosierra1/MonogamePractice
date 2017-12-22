@@ -11,10 +11,10 @@ namespace MonogamePractice.Sprites
 {
     public class Player : Sprite
     {
-        public bool HasDied = false;
+        public int Score;
 
         public Player(Texture2D texture)
-            :base(texture)
+            : base(texture)
         {
 
         }
@@ -25,37 +25,40 @@ namespace MonogamePractice.Sprites
 
             foreach (var sprite in sprites)
             {
-                if(sprite == this)
+                if(sprite is Player)
                 {
                     continue;
                 }
 
-                if(sprite.Rectangle.Intersects(Rectangle))
+                if(sprite.Rectangle.Intersects(this.Rectangle))
                 {
-                    this.HasDied = true;
+                    Score++;
+                    sprite.IsRemoved = true;
                 }
             }
-
-            Position += Velocity;
-            Position.X = MathHelper.Clamp(Position.X, 0, Game1.ScreenWidth - Rectangle.Width);
-            Velocity = Vector2.Zero;
         }
 
         private void Move()
         {
-            if (Input == null)
-            {
-                throw new Exception("Please assign a value an 'input'");
-            }
-
             if (Keyboard.GetState().IsKeyDown(Input.Left))
             {
-                Velocity.X = -Speed;
+                Postition.X -= Speed;
             }
             else if (Keyboard.GetState().IsKeyDown(Input.Right))
             {
-                Velocity.X = Speed;
+                Postition.X += Speed;
             }
+
+            if (Keyboard.GetState().IsKeyDown(Input.Up))
+            {
+                Postition.Y -= Speed;
+            }
+            else if (Keyboard.GetState().IsKeyDown(Input.Down))
+            {
+                Postition.Y += Speed;
+            }
+
+            Postition = Vector2.Clamp(Postition, new Vector2(0, 0), new Vector2(Game1.ScreenWidth - this.Rectangle.Width, Game1.ScreenHeight - this.Rectangle.Height));
         }
     }
 }

@@ -7,12 +7,11 @@ using System.Threading.Tasks;
 
 namespace MonogamePractice.Models
 {
-    /**
-     * 007
-     */
     public class Input
     {
         public Keys Left;
         public Keys Right;
+        public Keys Up;
+        public Keys Down;
     }
 }
