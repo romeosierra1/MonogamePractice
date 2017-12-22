@@ -17,31 +17,14 @@ namespace MonogamePractice
         SpriteBatch spriteBatch;
 
         /**
-         * 008
+         * 009
          */
-
-        public static Random Random;
-
-        public static int ScreenWidth;
-        public static int ScreenHeight;
-
         private List<Sprite> _sprites;
-
-        private SpriteFont _font;
-
-        private float _timer;
-
-        private Texture2D _appleTexture;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-
-            Random = new Random();
-
-            ScreenWidth = graphics.PreferredBackBufferWidth;
-            ScreenHeight = graphics.PreferredBackBufferHeight;
         }
 
         /// <summary>
@@ -67,7 +50,7 @@ namespace MonogamePractice
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             /**
-             * 008
+             * 009
              */
 
             var playerTexture = Content.Load<Texture2D>("Player");
@@ -82,7 +65,7 @@ namespace MonogamePractice
                         Up = Keys.W,
                         Down = Keys.S
                     },
-                    Postition = new Vector2(100,100),
+                    Position = new Vector2(100,100),
                     Color = Color.Blue,
                     Speed = 5f
                 },
@@ -95,14 +78,11 @@ namespace MonogamePractice
                         Up = Keys.Up,
                         Down = Keys.Down
                     },
-                    Postition = new Vector2(ScreenWidth - 100-playerTexture.Width,100),
+                    Position = new Vector2(300,100),
                     Color = Color.Green,
                     Speed = 5f
                 }
             };
-
-            _font = Content.Load<SpriteFont>("Font");
-            _appleTexture = Content.Load<Texture2D>("Apple");
         }
 
         /// <summary>
@@ -125,50 +105,16 @@ namespace MonogamePractice
                 Exit();
 
             /**
-             * 008
+             * 009
              */
-            _timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
             foreach (var sprite in _sprites)
             {
                 sprite.Update(gameTime, _sprites);
             }
-
-            PostUpdate();
-
-            SpawnApple();
-
+            
             base.Update(gameTime);
         }
-
-        private void SpawnApple()
-        {
-            if (_timer > 1)
-            {
-                _timer = 0;
-
-                var xPos = Random.Next(0, ScreenWidth - _appleTexture.Width);
-                var yPos = Random.Next(0, ScreenHeight - _appleTexture.Height);
-
-                _sprites.Add(new Sprite(_appleTexture)
-                {
-                    Postition = new Vector2(xPos, yPos)
-                });
-            }
-        }
-
-        private void PostUpdate()
-        {
-            for (int i = 0; i < _sprites.Count; i++)
-            {
-                if (_sprites[i].IsRemoved)
-                {
-                    _sprites.RemoveAt(i);
-                    i--;
-                }
-            }
-        }
-
+        
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
@@ -178,7 +124,7 @@ namespace MonogamePractice
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             /**
-             * 008
+             * 009
              */
 
             spriteBatch.Begin();
@@ -186,17 +132,6 @@ namespace MonogamePractice
             foreach (var sprite in _sprites)
             {
                 sprite.Draw(spriteBatch);
-            }
-
-            var fontY = 10;
-            var i = 0;
-
-            foreach (var sprite in _sprites)
-            {
-                if(sprite is Player)
-                {
-                    spriteBatch.DrawString(_font, string.Format("Player {0}: {1}", ++i, ((Player)sprite).Score), new Vector2(10, fontY += 20), Color.Black);
-                }
             }
 
             spriteBatch.End();

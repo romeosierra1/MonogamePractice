@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace MonogamePractice.Models
 {
+    /**
+     * 009
+     **/
     public class Input
     {
         public Keys Left;

@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 
 namespace MonogamePractice.Sprites
 {
+    /**
+     * 009
+     **/
     public class Player : Sprite
-    {
-        public int Score;
-
+    {        
         public Player(Texture2D texture)
             : base(texture)
         {
@@ -25,16 +26,26 @@ namespace MonogamePractice.Sprites
 
             foreach (var sprite in sprites)
             {
-                if(sprite is Player)
+                if(sprite == this)
                 {
                     continue;
                 }
 
-                if(sprite.Rectangle.Intersects(this.Rectangle))
+                if((this.Velocity.X > 0 && this.IsTouchingLeft(sprite)) ||
+                    (this.Velocity.X < 0 && this.IsTouchingRight(sprite)))
                 {
-                    Score++;
-                    sprite.IsRemoved = true;
+                    this.Velocity.X = 0;
                 }
+
+                if ((this.Velocity.Y > 0 && this.IsTouchingTop(sprite)) ||
+                    (this.Velocity.Y < 0 && this.IsTouchingBottom(sprite)))
+                {
+                    this.Velocity.Y = 0;
+                }
+
+                Position += Velocity;
+
+                Velocity = Vector2.Zero;
             }
         }
 
@@ -42,23 +53,21 @@ namespace MonogamePractice.Sprites
         {
             if (Keyboard.GetState().IsKeyDown(Input.Left))
             {
-                Postition.X -= Speed;
+                Velocity.X -= Speed;
             }
             else if (Keyboard.GetState().IsKeyDown(Input.Right))
             {
-                Postition.X += Speed;
+                Velocity.X += Speed;
             }
 
             if (Keyboard.GetState().IsKeyDown(Input.Up))
             {
-                Postition.Y -= Speed;
+                Velocity.Y -= Speed;
             }
             else if (Keyboard.GetState().IsKeyDown(Input.Down))
             {
-                Postition.Y += Speed;
+                Velocity.Y += Speed;
             }
-
-            Postition = Vector2.Clamp(Postition, new Vector2(0, 0), new Vector2(Game1.ScreenWidth - this.Rectangle.Width, Game1.ScreenHeight - this.Rectangle.Height));
         }
     }
 }
