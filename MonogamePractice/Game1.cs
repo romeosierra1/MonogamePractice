@@ -1,9 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonogamePractice.Models;
-using MonogamePractice.Sprites;
+using MonogamePractice.Controls;
 using System;
 using System.Collections.Generic;
 
@@ -17,7 +15,8 @@ namespace MonogamePractice
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        private List<Sprite> _sprites;
+        private Color _backgroundColor = Color.CornflowerBlue;
+        private List<Component> _gameComponent;
 
         public Game1()
         {
@@ -34,6 +33,7 @@ namespace MonogamePractice
         protected override void Initialize()
         {
             base.Initialize();
+            IsMouseVisible = true;
         }
 
         /// <summary>
@@ -45,39 +45,39 @@ namespace MonogamePractice
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            var animations = new Dictionary<string, Animation>()
+            var randomButton = new Button(Content.Load<Texture2D>("Controls/Button"), Content.Load<SpriteFont>("Fonts/Font"))
             {
-                {"WalkUp", new Animation(Content.Load<Texture2D>("Player/WalkingUp"), 3) },
-                {"WalkDown", new Animation(Content.Load<Texture2D>("Player/WalkingDown"), 3) },
-                {"WalkLeft", new Animation(Content.Load<Texture2D>("Player/WalkingLeft"), 3) },
-                {"WalkRight", new Animation(Content.Load<Texture2D>("Player/WalkingRight"), 3) }
+                Position = new Vector2(350, 200),
+                Text = "Random"
             };
 
-            _sprites = new List<Sprite>()
+            randomButton.Click += RandomButton_Click;
+
+            var quitButton = new Button(Content.Load<Texture2D>("Controls/Button"), Content.Load<SpriteFont>("Fonts/Font"))
             {
-                new Sprite(animations)
-                {
-                    Position = new Vector2(100,100),
-                    Input = new Input()
-                    {
-                        Up = Keys.W,
-                        Down = Keys.S,
-                        Left = Keys.A,
-                        Right = Keys.D
-                    }
-                },
-                new Sprite(animations)
-                {
-                    Position = new Vector2(200,100),
-                    Input = new Input()
-                    {
-                        Up = Keys.Up,
-                        Down = Keys.Down,
-                        Left = Keys.Left,
-                        Right = Keys.Right
-                    }
-                }
+                Position = new Vector2(350, 250),
+                Text = "Quit"
             };
+
+            quitButton.Click += QuitButton_Click;
+
+            _gameComponent = new List<Component>()
+            {
+                randomButton,
+                quitButton
+            };
+        }
+
+        private void QuitButton_Click(object sender, EventArgs e)
+        {
+            Exit();
+        }
+
+        private void RandomButton_Click(object sender, EventArgs e)
+        {
+            var random = new Random();
+
+            _backgroundColor = new Color(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255));
         }
 
         /// <summary>
@@ -97,11 +97,11 @@ namespace MonogamePractice
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();           
+                Exit();
 
-            foreach (var sprite in _sprites)
+            foreach (var component in _gameComponent)
             {
-                sprite.Update(gameTime, _sprites);
+                component.Update(gameTime);
             }
 
             base.Update(gameTime);
@@ -113,15 +113,15 @@ namespace MonogamePractice
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);            
+            GraphicsDevice.Clear(_backgroundColor);
 
             spriteBatch.Begin();
-            
-            foreach (var sprite in _sprites)
+
+            foreach (var component in _gameComponent)
             {
-                sprite.Draw(spriteBatch);
+                component.Draw(gameTime, spriteBatch);
             }
-            
+
             spriteBatch.End();
 
             base.Draw(gameTime);
