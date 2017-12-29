@@ -38,6 +38,10 @@ namespace MonogamePractice.Controls
             PenColor = Color.Black;
         }
 
+        public Button()
+        {
+        }
+
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             var color = Color.White;

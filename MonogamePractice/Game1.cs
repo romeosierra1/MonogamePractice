@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonogamePractice.Controls;
+using MonogamePractice.States;
 using System;
 using System.Collections.Generic;
 
@@ -16,12 +17,18 @@ namespace MonogamePractice
         SpriteBatch spriteBatch;
 
         private Color _backgroundColor = Color.CornflowerBlue;
-        private List<Component> _gameComponent;
+        private State _currentState;
+        private State _nextState;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+        }
+
+        public void ChangeState(State state)
+        {
+            _nextState = state;
         }
 
         /// <summary>
@@ -45,40 +52,8 @@ namespace MonogamePractice
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            var randomButton = new Button(Content.Load<Texture2D>("Controls/Button"), Content.Load<SpriteFont>("Fonts/Font"))
-            {
-                Position = new Vector2(350, 200),
-                Text = "Random"
-            };
-
-            randomButton.Click += RandomButton_Click;
-
-            var quitButton = new Button(Content.Load<Texture2D>("Controls/Button"), Content.Load<SpriteFont>("Fonts/Font"))
-            {
-                Position = new Vector2(350, 250),
-                Text = "Quit"
-            };
-
-            quitButton.Click += QuitButton_Click;
-
-            _gameComponent = new List<Component>()
-            {
-                randomButton,
-                quitButton
-            };
-        }
-
-        private void QuitButton_Click(object sender, EventArgs e)
-        {
-            Exit();
-        }
-
-        private void RandomButton_Click(object sender, EventArgs e)
-        {
-            var random = new Random();
-
-            _backgroundColor = new Color(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255));
-        }
+            _currentState = new MenuState(this, graphics.GraphicsDevice, Content);
+        }        
 
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
@@ -96,13 +71,15 @@ namespace MonogamePractice
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
-            foreach (var component in _gameComponent)
+            if(_nextState != null)
             {
-                component.Update(gameTime);
+                _currentState = _nextState;
+                _nextState = null;
             }
+
+            _currentState.Update(gameTime);
+
+            _currentState.PostUpdate(gameTime);
 
             base.Update(gameTime);
         }
@@ -115,14 +92,7 @@ namespace MonogamePractice
         {
             GraphicsDevice.Clear(_backgroundColor);
 
-            spriteBatch.Begin();
-
-            foreach (var component in _gameComponent)
-            {
-                component.Draw(gameTime, spriteBatch);
-            }
-
-            spriteBatch.End();
+            _currentState.Draw(gameTime, spriteBatch);
 
             base.Draw(gameTime);
         }
