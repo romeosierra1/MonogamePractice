@@ -1,9 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using MonogamePractice.Controls;
-using MonogamePractice.States;
-using System;
+using MonogamePractice.Core;
+using MonogamePractice.Sprites;
 using System.Collections.Generic;
 
 namespace MonogamePractice
@@ -16,20 +14,18 @@ namespace MonogamePractice
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        private Color _backgroundColor = Color.CornflowerBlue;
-        private State _currentState;
-        private State _nextState;
+        public static int ScreenWidth;
+        public static int ScreenHeight;
 
+        private Camera _camera;
+        private List<Component> _components;
+        private Player _player;
+       
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-        }
-
-        public void ChangeState(State state)
-        {
-            _nextState = state;
-        }
+        }       
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -41,6 +37,8 @@ namespace MonogamePractice
         {
             base.Initialize();
             IsMouseVisible = true;
+            ScreenWidth = graphics.PreferredBackBufferWidth;
+            ScreenHeight = graphics.PreferredBackBufferHeight;
         }
 
         /// <summary>
@@ -52,7 +50,15 @@ namespace MonogamePractice
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            _currentState = new MenuState(this, graphics.GraphicsDevice, Content);
+            _camera = new Camera();
+            _player = new Player(Content.Load<Texture2D>("Player"));
+
+            _components = new List<Component>()
+            {
+                new Sprite(Content.Load<Texture2D>("Background")),
+                _player,
+                new Sprite(Content.Load<Texture2D>("NPC"))
+            };
         }        
 
         /// <summary>
@@ -71,15 +77,12 @@ namespace MonogamePractice
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if(_nextState != null)
+            foreach (var component in _components)
             {
-                _currentState = _nextState;
-                _nextState = null;
+                component.Update(gameTime);
             }
 
-            _currentState.Update(gameTime);
-
-            _currentState.PostUpdate(gameTime);
+            _camera.Follow(_player);
 
             base.Update(gameTime);
         }
@@ -90,9 +93,16 @@ namespace MonogamePractice
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(_backgroundColor);
+            GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            _currentState.Draw(gameTime, spriteBatch);
+            spriteBatch.Begin(transformMatrix: _camera.Transform);
+
+            foreach (var component in _components)
+            {
+                component.Draw(gameTime, spriteBatch);
+            }
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
